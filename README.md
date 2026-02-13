@@ -11,6 +11,8 @@ feel free to look around, borrow ideas, or use it as a starting point for your o
 - active window title
 - system info (cpu, memory, network, battery, temperature)
 - system tray
+<img width="1920" height="268" alt="image" src="https://github.com/user-attachments/assets/93107304-d012-4923-a06b-e37a8d5cf041" />
+
 
 ## structure
 
