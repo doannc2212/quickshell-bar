@@ -201,6 +201,24 @@ Scope {
           clip: true
           spacing: 2
           boundsBehavior: Flickable.StopAtBounds
+          currentIndex: root.selectedIndex
+          highlightMoveDuration: 150
+          highlightMoveVelocity: -1
+
+          highlight: Rectangle {
+            radius: 8
+            color: Theme.bgSelected
+
+            Rectangle {
+              width: 3
+              height: 24
+              radius: 2
+              color: Theme.accentPrimary
+              anchors.left: parent.left
+              anchors.leftMargin: 2
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
 
           delegate: Rectangle {
             id: delegateRoot
@@ -210,23 +228,10 @@ Scope {
             width: resultsList.width
             height: 44
             radius: 8
-            color: root.selectedIndex === index ? Theme.bgSelected :
-                   hoverArea.containsMouse ? Theme.bgHover : "transparent"
+            color: hoverArea.containsMouse && root.selectedIndex !== index ? Theme.bgHover : "transparent"
 
             Behavior on color {
               ColorAnimation { duration: 100 }
-            }
-
-            // Selection indicator
-            Rectangle {
-              visible: root.selectedIndex === index
-              width: 3
-              height: 24
-              radius: 2
-              color: Theme.accentPrimary
-              anchors.left: parent.left
-              anchors.leftMargin: 2
-              anchors.verticalCenter: parent.verticalCenter
             }
 
             RowLayout {

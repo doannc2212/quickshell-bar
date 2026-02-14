@@ -45,10 +45,78 @@ Singleton {
             saveProc.command = ["sh", "-c",
                 "echo " + index + " > $HOME/.config/quickshell/theme.conf"];
             saveProc.running = true;
+            applyKittyTheme(themes[index]);
         }
     }
 
+    function applyKittyTheme(t) {
+        var colorsConf = [
+            "foreground " + t.textPrimary,
+            "background " + t.bgBase,
+            "cursor " + t.accentPrimary,
+            "cursor_text_color " + t.bgBase,
+            "selection_foreground " + t.textPrimary,
+            "selection_background " + t.bgSelected,
+            "active_tab_foreground " + t.textPrimary,
+            "active_tab_background " + t.bgSurface,
+            "inactive_tab_foreground " + t.textMuted,
+            "inactive_tab_background " + t.bgBase,
+            "color0 " + t.bgSurface,
+            "color1 " + t.accentRed,
+            "color2 " + t.accentGreen,
+            "color3 " + t.accentOrange,
+            "color4 " + t.accentPrimary,
+            "color5 " + t.accentPrimary,
+            "color6 " + t.accentCyan,
+            "color7 " + t.textSecondary,
+            "color8 " + t.textMuted,
+            "color9 " + t.accentRed,
+            "color10 " + t.accentGreen,
+            "color11 " + t.accentOrange,
+            "color12 " + t.accentPrimary,
+            "color13 " + t.accentPrimary,
+            "color14 " + t.accentCyan,
+            "color15 " + t.textPrimary
+        ].join("\n");
+        var colorsArgs = [
+            "foreground=" + t.textPrimary,
+            "background=" + t.bgBase,
+            "cursor=" + t.accentPrimary,
+            "cursor_text_color=" + t.bgBase,
+            "selection_foreground=" + t.textPrimary,
+            "selection_background=" + t.bgSelected,
+            "active_tab_foreground=" + t.textPrimary,
+            "active_tab_background=" + t.bgSurface,
+            "inactive_tab_foreground=" + t.textMuted,
+            "inactive_tab_background=" + t.bgBase,
+            "color0=" + t.bgSurface,
+            "color1=" + t.accentRed,
+            "color2=" + t.accentGreen,
+            "color3=" + t.accentOrange,
+            "color4=" + t.accentPrimary,
+            "color5=" + t.accentPrimary,
+            "color6=" + t.accentCyan,
+            "color7=" + t.textSecondary,
+            "color8=" + t.textMuted,
+            "color9=" + t.accentRed,
+            "color10=" + t.accentGreen,
+            "color11=" + t.accentOrange,
+            "color12=" + t.accentPrimary,
+            "color13=" + t.accentPrimary,
+            "color14=" + t.accentCyan,
+            "color15=" + t.textPrimary
+        ].join(" ");
+        kittyProc.command = ["sh", "-c",
+            "printf '%s\\n' '" + colorsConf + "' > $HOME/.config/kitty/theme-colors.conf; " +
+            "for sock in /tmp/kitty-*; do " +
+            "[ -S \"$sock\" ] && kitty @ --to \"unix:$sock\" set-colors --all --configured " + colorsArgs + "; " +
+            "done"
+        ];
+        kittyProc.running = true;
+    }
+
     Process { id: saveProc; running: false }
+    Process { id: kittyProc; running: false }
 
     Process {
         id: loadProc
@@ -57,8 +125,10 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 const idx = parseInt(text.trim());
-                if (!isNaN(idx) && idx >= 0 && idx < root.themes.length)
+                if (!isNaN(idx) && idx >= 0 && idx < root.themes.length) {
                     root.currentIndex = idx;
+                    root.applyKittyTheme(root.themes[idx]);
+                }
             }
         }
     }
