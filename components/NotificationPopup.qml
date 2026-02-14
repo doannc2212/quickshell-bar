@@ -231,7 +231,7 @@ Scope {
                       anchors.fill: parent
                       hoverEnabled: true
                       cursorShape: Qt.PointingHandCursor
-                      onClicked: actionBtn.modelData.invoke()
+                      onClicked: NotificationService.invokeAction(notifCard.modelData, actionBtn.modelData)
                     }
                   }
                 }

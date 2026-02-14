@@ -36,17 +36,26 @@ Singleton {
   }
 
   function dismiss(notification) {
-    notification.dismiss();
+    if (!notification) return;
     root.notifications = root.notifications.filter(n => n !== notification);
+    notification.dismiss();
   }
 
   function expire(notification) {
-    notification.expire();
+    if (!notification) return;
     root.notifications = root.notifications.filter(n => n !== notification);
+    notification.expire();
+  }
+
+  function invokeAction(notification, action) {
+    if (!notification || !action) return;
+    root.notifications = root.notifications.filter(n => n !== notification);
+    action.invoke();
   }
 
   function dismissAll() {
-    for (const n of root.notifications) n.dismiss();
+    const toRemove = [...root.notifications];
     root.notifications = [];
+    for (const n of toRemove) n.dismiss();
   }
 }
