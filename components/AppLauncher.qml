@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../services"
 
 Scope {
   id: root
@@ -79,7 +80,7 @@ Scope {
 
       Rectangle {
         anchors.fill: parent
-        color: "#88000000"
+        color: Theme.bgOverlay
       }
     }
 
@@ -90,8 +91,8 @@ Scope {
       width: 580
       height: 480
       radius: 16
-      color: "#1a1b26"
-      border.color: "#32364a"
+      color: Theme.bgBase
+      border.color: Theme.bgBorder
       border.width: 1
 
       ColumnLayout {
@@ -102,7 +103,7 @@ Scope {
         // Header
         Text {
           text: "  Applications"
-          color: "#7aa2f7"
+          color: Theme.accentPrimary
           font.pixelSize: 14
           font.family: "Hack Nerd Font"
           font.bold: true
@@ -113,8 +114,8 @@ Scope {
           Layout.fillWidth: true
           height: 44
           radius: 10
-          color: "#24283b"
-          border.color: searchInput.activeFocus ? "#7aa2f7" : "#32364a"
+          color: Theme.bgSurface
+          border.color: searchInput.activeFocus ? Theme.accentPrimary : Theme.bgBorder
           border.width: 1
 
           Behavior on border.color {
@@ -129,7 +130,7 @@ Scope {
 
             Text {
               text: ""
-              color: "#565f89"
+              color: Theme.textMuted
               font.pixelSize: 16
               font.family: "Hack Nerd Font"
               Layout.alignment: Qt.AlignVCenter
@@ -139,7 +140,7 @@ Scope {
               id: searchInput
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignVCenter
-              color: "#c0caf5"
+              color: Theme.textPrimary
               font.pixelSize: 15
               font.family: "Hack Nerd Font"
               clip: true
@@ -148,7 +149,7 @@ Scope {
               Text {
                 anchors.fill: parent
                 text: "Type to search..."
-                color: "#565f89"
+                color: Theme.textMuted
                 font: parent.font
                 visible: !parent.text && !parent.activeFocus
                 verticalAlignment: Text.AlignVCenter
@@ -186,7 +187,7 @@ Scope {
         // Results count
         Text {
           text: resultsList.count + " application" + (resultsList.count !== 1 ? "s" : "")
-          color: "#565f89"
+          color: Theme.textMuted
           font.pixelSize: 11
           font.family: "Hack Nerd Font"
         }
@@ -209,8 +210,8 @@ Scope {
             width: resultsList.width
             height: 44
             radius: 8
-            color: root.selectedIndex === index ? "#283457" :
-                   hoverArea.containsMouse ? "#1e2235" : "transparent"
+            color: root.selectedIndex === index ? Theme.bgSelected :
+                   hoverArea.containsMouse ? Theme.bgHover : "transparent"
 
             Behavior on color {
               ColorAnimation { duration: 100 }
@@ -222,7 +223,7 @@ Scope {
               width: 3
               height: 24
               radius: 2
-              color: "#7aa2f7"
+              color: Theme.accentPrimary
               anchors.left: parent.left
               anchors.leftMargin: 2
               anchors.verticalCenter: parent.verticalCenter
@@ -250,7 +251,7 @@ Scope {
                 Text {
                   anchors.centerIn: parent
                   text: ""
-                  color: "#7aa2f7"
+                  color: Theme.accentPrimary
                   font.pixelSize: 20
                   font.family: "Hack Nerd Font"
                   visible: (delegateRoot.modelData.icon ?? "") === ""
@@ -265,7 +266,7 @@ Scope {
 
                 Text {
                   text: delegateRoot.modelData.name ?? ""
-                  color: root.selectedIndex === delegateRoot.index ? "#c0caf5" : "#a9b1d6"
+                  color: root.selectedIndex === delegateRoot.index ? Theme.textPrimary : Theme.textSecondary
                   font.pixelSize: 13
                   font.family: "Hack Nerd Font"
                   font.bold: root.selectedIndex === delegateRoot.index
@@ -275,7 +276,7 @@ Scope {
 
                 Text {
                   text: delegateRoot.modelData.genericName ?? delegateRoot.modelData.comment ?? ""
-                  color: "#565f89"
+                  color: Theme.textMuted
                   font.pixelSize: 11
                   font.family: "Hack Nerd Font"
                   elide: Text.ElideRight
@@ -299,7 +300,7 @@ Scope {
           Text {
             anchors.centerIn: parent
             text: "  No applications found"
-            color: "#565f89"
+            color: Theme.textMuted
             font.pixelSize: 14
             font.family: "Hack Nerd Font"
             visible: resultsList.count === 0 && searchInput.text !== ""
@@ -314,28 +315,28 @@ Scope {
           Row {
             spacing: 4
             Rectangle {
-              width: hintUp.width + 8; height: 18; radius: 4; color: "#24283b"
-              Text { id: hintUp; anchors.centerIn: parent; text: "↑↓"; color: "#565f89"; font.pixelSize: 10; font.family: "Hack Nerd Font" }
+              width: hintUp.width + 8; height: 18; radius: 4; color: Theme.bgSurface
+              Text { id: hintUp; anchors.centerIn: parent; text: "↑↓"; color: Theme.textMuted; font.pixelSize: 10; font.family: "Hack Nerd Font" }
             }
-            Text { text: "navigate"; color: "#565f89"; font.pixelSize: 10; font.family: "Hack Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "navigate"; color: Theme.textMuted; font.pixelSize: 10; font.family: "Hack Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
           }
 
           Row {
             spacing: 4
             Rectangle {
-              width: hintEnter.width + 8; height: 18; radius: 4; color: "#24283b"
-              Text { id: hintEnter; anchors.centerIn: parent; text: "⏎"; color: "#565f89"; font.pixelSize: 10; font.family: "Hack Nerd Font" }
+              width: hintEnter.width + 8; height: 18; radius: 4; color: Theme.bgSurface
+              Text { id: hintEnter; anchors.centerIn: parent; text: "⏎"; color: Theme.textMuted; font.pixelSize: 10; font.family: "Hack Nerd Font" }
             }
-            Text { text: "launch"; color: "#565f89"; font.pixelSize: 10; font.family: "Hack Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "launch"; color: Theme.textMuted; font.pixelSize: 10; font.family: "Hack Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
           }
 
           Row {
             spacing: 4
             Rectangle {
-              width: hintEsc.width + 8; height: 18; radius: 4; color: "#24283b"
-              Text { id: hintEsc; anchors.centerIn: parent; text: "esc"; color: "#565f89"; font.pixelSize: 10; font.family: "Hack Nerd Font" }
+              width: hintEsc.width + 8; height: 18; radius: 4; color: Theme.bgSurface
+              Text { id: hintEsc; anchors.centerIn: parent; text: "esc"; color: Theme.textMuted; font.pixelSize: 10; font.family: "Hack Nerd Font" }
             }
-            Text { text: "close"; color: "#565f89"; font.pixelSize: 10; font.family: "Hack Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "close"; color: Theme.textMuted; font.pixelSize: 10; font.family: "Hack Nerd Font"; anchors.verticalCenter: parent.verticalCenter }
           }
 
           Item { Layout.fillWidth: true }

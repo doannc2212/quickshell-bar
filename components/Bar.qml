@@ -2,6 +2,7 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import "../widgets"
+import "../services"
 
 Scope {
   Variants {
@@ -18,7 +19,7 @@ Scope {
       }
 
       implicitHeight: 32
-      color: "#1a1b26"
+      color: Theme.bgBase
 
       RowLayout {
         anchors.fill: parent

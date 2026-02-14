@@ -1,10 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Hyprland
+import "../services"
 
 Text {
   text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
-  color: "#c0caf5"
+  color: Theme.textPrimary
   font.pixelSize: 13
   font.family: "Hack Nerd Font"
   elide: Text.ElideRight

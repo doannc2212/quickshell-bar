@@ -13,6 +13,7 @@ feel free to look around, borrow ideas, or use it as a starting point for your o
 - system tray
 - app launcher (rofi drun-style)
 - notification popups (dunst-style)
+- theme switcher (15 themes across 3 families)
 
 <img width="1920" height="111" alt="image" src="https://github.com/user-attachments/assets/06d824ae-cf21-4c78-919c-1604f1c0a2dc" />
 <br/>
@@ -28,8 +29,9 @@ shell.qml                       # entry point
 components/Bar.qml              # bar layout, one per screen
 components/AppLauncher.qml      # app launcher overlay
 components/NotificationPopup.qml # notification popups
+components/ThemeSwitcher.qml    # theme picker overlay
 widgets/                        # ui pieces (clock, workspaces, etc.)
-services/                       # data providers (time, system info, notifications)
+services/                       # data providers (time, system info, notifications, theme)
 ```
 
 ## dependencies
@@ -88,9 +90,35 @@ features:
 
 **note:** only one notification daemon can run on D-Bus at a time — stop dunst/mako before using this.
 
+## theme switcher
+
+a built-in theme picker with 15 themes across 3 families. toggle it via IPC:
+
+```bash
+qs ipc call theme toggle
+```
+
+bind it in `hyprland.conf`:
+
+```
+bind = SUPER, T, exec, qs ipc call theme toggle
+```
+
+available themes:
+- **Tokyo Night** — Night, Storm, Moon, Light
+- **Catppuccin** — Mocha, Macchiato, Frappe, Latte
+- **Beared** — Arc, Surprising Eggplant, Oceanic, Solarized Dark, Coffee, Monokai Stone, Vivid Black
+
+features:
+- color swatches preview for each theme
+- keyboard navigation (arrow keys, enter, escape)
+- click backdrop to dismiss
+- selected theme persists across restarts (saved to `~/.config/quickshell/theme.conf`)
+- all components update instantly with smooth color transitions
+
 ## tweaking
 
-- **colors** — edit the hex values in widget files. the main background is `#1a1b26`.
+- **colors** — all colors are centralized in `services/Theme.qml`. select a theme via the theme switcher, or add your own by appending to the `themes` array.
 - **font** — search for `"Hack Nerd Font"` and swap it with yours.
 - **layout** — rearrange widgets in `components/Bar.qml`.
 - **polling rate** — change the interval in `services/SystemInfo.qml` (default 2s).

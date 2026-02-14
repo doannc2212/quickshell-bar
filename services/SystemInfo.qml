@@ -12,7 +12,7 @@ Singleton {
   property string networkInfo: "7F-Internal"
   property string batteryLevel: "0%"
   property string batteryIcon: "󰂎"
-  property string batteryColor: "#9ece6a"
+  property color batteryColor: Theme.batteryGood
   property string temperature: "0°C"
 
   // CPU Usage
@@ -79,9 +79,9 @@ Singleton {
         else root.batteryIcon = "󰁺"
         
         // Set color based on level
-        if (level > 20) root.batteryColor = "#9ece6a"
-        else if (level > 10) root.batteryColor = "#ff9e64"
-        else root.batteryColor = "#f7768e"
+        if (level > 20) root.batteryColor = Theme.batteryGood
+        else if (level > 10) root.batteryColor = Theme.batteryWarning
+        else root.batteryColor = Theme.batteryCritical
       }
     }
   }

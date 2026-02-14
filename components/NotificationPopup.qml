@@ -67,9 +67,9 @@ Scope {
             Layout.fillWidth: true
             Layout.preferredHeight: cardContent.implicitHeight + 24
             radius: 12
-            color: "#1a1b26"
-            border.color: modelData.urgency === NotificationUrgency.Critical ? "#f7768e" :
-                          modelData.urgency === NotificationUrgency.Low ? "#565f89" : "#32364a"
+            color: Theme.bgBase
+            border.color: modelData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical :
+                          modelData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.bgBorder
             border.width: 1
             opacity: 1
             clip: true
@@ -95,8 +95,8 @@ Scope {
               anchors.left: parent.left
               anchors.leftMargin: 6
               anchors.verticalCenter: parent.verticalCenter
-              color: modelData.urgency === NotificationUrgency.Critical ? "#f7768e" :
-                     modelData.urgency === NotificationUrgency.Low ? "#565f89" : "#7aa2f7"
+              color: modelData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical :
+                     modelData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
             }
 
             ColumnLayout {
@@ -127,7 +127,7 @@ Scope {
                         modelData.appName.toLowerCase().includes("alacritty")) return "";
                     return "󰂚";
                   }
-                  color: modelData.urgency === NotificationUrgency.Critical ? "#f7768e" : "#7aa2f7"
+                  color: modelData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical : Theme.urgencyNormal
                   font.pixelSize: 14
                   font.family: "Hack Nerd Font"
                   Layout.alignment: Qt.AlignVCenter
@@ -135,7 +135,7 @@ Scope {
 
                 Text {
                   text: modelData.appName || "Notification"
-                  color: "#565f89"
+                  color: Theme.textMuted
                   font.pixelSize: 11
                   font.family: "Hack Nerd Font"
                   Layout.alignment: Qt.AlignVCenter
@@ -148,13 +148,13 @@ Scope {
                   width: 20
                   height: 20
                   radius: 10
-                  color: closeHover.containsMouse ? "#32364a" : "transparent"
+                  color: closeHover.containsMouse ? Theme.bgBorder : "transparent"
                   Layout.alignment: Qt.AlignVCenter
 
                   Text {
                     anchors.centerIn: parent
                     text: "󰅖"
-                    color: closeHover.containsMouse ? "#f7768e" : "#565f89"
+                    color: closeHover.containsMouse ? Theme.accentRed : Theme.textMuted
                     font.pixelSize: 12
                     font.family: "Hack Nerd Font"
                   }
@@ -172,7 +172,7 @@ Scope {
               // Summary (title)
               Text {
                 text: modelData.summary || ""
-                color: "#c0caf5"
+                color: Theme.textPrimary
                 font.pixelSize: 13
                 font.family: "Hack Nerd Font"
                 font.bold: true
@@ -184,7 +184,7 @@ Scope {
               // Body
               Text {
                 text: modelData.body || ""
-                color: "#a9b1d6"
+                color: Theme.textSecondary
                 font.pixelSize: 12
                 font.family: "Hack Nerd Font"
                 wrapMode: Text.Wrap
@@ -211,7 +211,7 @@ Scope {
                     Layout.preferredHeight: 26
                     Layout.preferredWidth: actionText.width + 16
                     radius: 6
-                    color: actionHover.containsMouse ? "#32364a" : "#24283b"
+                    color: actionHover.containsMouse ? Theme.bgBorder : Theme.bgSurface
 
                     Behavior on color {
                       ColorAnimation { duration: 100 }
@@ -221,7 +221,7 @@ Scope {
                       id: actionText
                       anchors.centerIn: parent
                       text: actionBtn.modelData.text
-                      color: "#7aa2f7"
+                      color: Theme.accentPrimary
                       font.pixelSize: 11
                       font.family: "Hack Nerd Font"
                     }
@@ -242,14 +242,14 @@ Scope {
                 Layout.fillWidth: true
                 height: 2
                 radius: 1
-                color: "#24283b"
+                color: Theme.bgSurface
                 Layout.topMargin: 2
 
                 Rectangle {
                   id: progressBar
                   height: parent.height
                   radius: 1
-                  color: modelData.urgency === NotificationUrgency.Critical ? "#f7768e" : "#7aa2f7"
+                  color: modelData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical : Theme.urgencyNormal
                   opacity: 0.6
 
                   NumberAnimation on width {

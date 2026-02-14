@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Hyprland
+import "../services"
 
 Row {
   spacing: 4
@@ -12,12 +13,12 @@ Row {
       width: modelData.focused ? 32 : 24
       height: 24
       radius: 12
-      color: modelData.focused ? "#7aa2f7" : "#24283b"
+      color: modelData.focused ? Theme.accentPrimary : Theme.bgSurface
 
       Text {
         anchors.centerIn: parent
         text: modelData.id
-        color: modelData.focused ? "#1a1b26" : "#c0caf5"
+        color: modelData.focused ? Theme.bgBase : Theme.textPrimary
         font.pixelSize: 11
         font.family: "Hack Nerd Font"
         font.bold: modelData.focused

@@ -11,4 +11,5 @@ Scope {
   Bar {}
   AppLauncher {}
   NotificationPopup {}
+  ThemeSwitcher {}
 }

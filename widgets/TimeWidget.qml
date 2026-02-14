@@ -5,7 +5,7 @@ Rectangle {
   height: 24
   width: timeDate.width + 16
   radius: 12
-  color: "#24283b"
+  color: Theme.bgSurface
 
   Row {
     id: timeDate
@@ -15,7 +15,7 @@ Rectangle {
     Text {
       anchors.verticalCenter: parent.verticalCenter
       text: ""
-      color: "#7aa2f7"
+      color: Theme.accentPrimary
       font.pixelSize: 14
       font.family: "Hack Nerd Font"
     }
@@ -23,7 +23,7 @@ Rectangle {
     Text {
       anchors.verticalCenter: parent.verticalCenter
       text: Time.timeString
-      color: "#c0caf5"
+      color: Theme.textPrimary
       font.pixelSize: 12
       font.family: "Hack Nerd Font"
     }
@@ -31,7 +31,7 @@ Rectangle {
     Text {
       anchors.verticalCenter: parent.verticalCenter
       text: Time.dateString
-      color: "#a9b1d6"
+      color: Theme.textSecondary
       font.pixelSize: 12
       font.family: "Hack Nerd Font"
     }

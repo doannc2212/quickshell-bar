@@ -9,7 +9,7 @@ Row {
     height: 24
     width: cpuContent.width + 12
     radius: 12
-    color: "#24283b"
+    color: Theme.bgSurface
 
     Row {
       id: cpuContent
@@ -19,14 +19,14 @@ Row {
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: "󰻠"
-        color: "#ff9e64"
+        color: Theme.accentOrange
         font.pixelSize: 14
         font.family: "Hack Nerd Font"
       }
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: SystemInfo.cpuUsage
-        color: "#c0caf5"
+        color: Theme.textPrimary
         font.pixelSize: 11
         font.family: "Hack Nerd Font"
       }
@@ -38,7 +38,7 @@ Row {
     height: 24
     width: memContent.width + 12
     radius: 12
-    color: "#24283b"
+    color: Theme.bgSurface
 
     Row {
       id: memContent
@@ -48,14 +48,14 @@ Row {
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: "󰍛"
-        color: "#7dcfff"
+        color: Theme.accentCyan
         font.pixelSize: 14
         font.family: "Hack Nerd Font"
       }
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: SystemInfo.memoryUsage
-        color: "#c0caf5"
+        color: Theme.textPrimary
         font.pixelSize: 11
         font.family: "Hack Nerd Font"
       }
@@ -67,7 +67,7 @@ Row {
     height: 24
     width: netContent.width + 12
     radius: 12
-    color: "#24283b"
+    color: Theme.bgSurface
 
     Row {
       id: netContent
@@ -77,14 +77,14 @@ Row {
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: "󰛳"
-        color: "#9ece6a"
+        color: Theme.accentGreen
         font.pixelSize: 14
         font.family: "Hack Nerd Font"
       }
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: SystemInfo.networkInfo
-        color: "#c0caf5"
+        color: Theme.textPrimary
         font.pixelSize: 11
         font.family: "Hack Nerd Font"
       }
@@ -96,7 +96,7 @@ Row {
     height: 24
     width: battContent.width + 12
     radius: 12
-    color: "#24283b"
+    color: Theme.bgSurface
 
     Row {
       id: battContent
@@ -113,7 +113,7 @@ Row {
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: SystemInfo.batteryLevel
-        color: "#c0caf5"
+        color: Theme.textPrimary
         font.pixelSize: 11
         font.family: "Hack Nerd Font"
       }
@@ -125,7 +125,7 @@ Row {
     height: 24
     width: tempContent.width + 12
     radius: 12
-    color: "#24283b"
+    color: Theme.bgSurface
 
     Row {
       id: tempContent
@@ -135,14 +135,14 @@ Row {
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: "󰔏"
-        color: "#f7768e"
+        color: Theme.accentRed
         font.pixelSize: 14
         font.family: "Hack Nerd Font"
       }
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: SystemInfo.temperature
-        color: "#c0caf5"
+        color: Theme.textPrimary
         font.pixelSize: 11
         font.family: "Hack Nerd Font"
       }

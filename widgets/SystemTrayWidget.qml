@@ -3,13 +3,14 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Services.SystemTray
+import "../services"
 
 Rectangle {
   id: trayContainer
   implicitHeight: 24
   implicitWidth: trayIcons.implicitWidth + 4
   radius: 12
-  color: "#24283b"
+  color: Theme.bgSurface
 
   RowLayout {
     id: trayIcons
