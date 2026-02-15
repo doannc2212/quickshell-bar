@@ -14,14 +14,35 @@ Scope {
         function toggle(): void {
             themePanel.visible = !themePanel.visible;
             if (themePanel.visible) {
-                selectedIndex = root.theme.currentIndex;
+                searchInput.text = "";
+                searchText = "";
+                selectedIndex = 0;
+                for (var i = 0; i < filteredThemes.length; i++) {
+                    if (filteredThemes[i].originalIndex === root.theme.currentIndex) {
+                        selectedIndex = i;
+                        break;
+                    }
+                }
                 themeList.positionViewAtIndex(selectedIndex, ListView.Center);
-                themeList.forceActiveFocus();
+                searchInput.forceActiveFocus();
             }
         }
     }
 
     property int selectedIndex: 0
+    property string searchText: ""
+
+    property var filteredThemes: {
+        var query = searchText.toLowerCase();
+        var result = [];
+        for (var i = 0; i < root.theme.themes.length; i++) {
+            var t = root.theme.themes[i];
+            if (query === "" || t.name.toLowerCase().indexOf(query) >= 0 || t.family.toLowerCase().indexOf(query) >= 0) {
+                result.push({ data: t, originalIndex: i, family: t.family });
+            }
+        }
+        return result;
+    }
 
     PanelWindow {
         id: themePanel
@@ -85,7 +106,9 @@ Scope {
 
                 // Theme count
                 Text {
-                    text: root.theme.count + " themes — " + root.theme.currentFamily + " " + root.theme.currentName
+                    text: root.searchText !== ""
+                        ? root.filteredThemes.length + " of " + root.theme.count + " themes"
+                        : root.theme.count + " themes — " + root.theme.currentFamily + " " + root.theme.currentName
                     color: root.theme.textMuted
                     font.pixelSize: 11
                     font.family: "Hack Nerd Font"
@@ -93,16 +116,119 @@ Scope {
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
 
+                // Search field
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 36
+                    radius: 8
+                    color: root.theme.bgSurface
+                    border.color: searchInput.activeFocus ? root.theme.accentPrimary : root.theme.bgBorder
+                    border.width: 1
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 8
+
+                        Text {
+                            text: ""
+                            color: root.theme.textMuted
+                            font.pixelSize: 13
+                            font.family: "Hack Nerd Font"
+                            Layout.alignment: Qt.AlignVCenter
+
+                            Behavior on color { ColorAnimation { duration: 150 } }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter
+                            implicitHeight: searchInput.implicitHeight
+
+                            TextInput {
+                                id: searchInput
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: root.theme.textPrimary
+                                font.pixelSize: 13
+                                font.family: "Hack Nerd Font"
+                                clip: true
+                                selectByMouse: true
+
+                                onTextChanged: {
+                                    root.searchText = text;
+                                    root.selectedIndex = 0;
+                                }
+
+                                Keys.onEscapePressed: themePanel.visible = false
+
+                                Keys.onPressed: event => {
+                                    if (event.key === Qt.Key_Down) {
+                                        event.accepted = true;
+                                        root.selectedIndex = Math.min(root.selectedIndex + 1, themeList.count - 1);
+                                        themeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                                    } else if (event.key === Qt.Key_Up) {
+                                        event.accepted = true;
+                                        root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
+                                        themeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
+                                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                        event.accepted = true;
+                                        if (root.filteredThemes.length > 0) {
+                                            root.theme.setTheme(root.filteredThemes[root.selectedIndex].originalIndex);
+                                            themePanel.visible = false;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text {
+                                text: "Search themes..."
+                                color: root.theme.textMuted
+                                font.pixelSize: 13
+                                font.family: "Hack Nerd Font"
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: searchInput.text === ""
+
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                            }
+                        }
+
+                        Text {
+                            text: ""
+                            color: root.theme.textMuted
+                            font.pixelSize: 11
+                            font.family: "Hack Nerd Font"
+                            visible: searchInput.text !== ""
+                            Layout.alignment: Qt.AlignVCenter
+
+                            Behavior on color { ColorAnimation { duration: 150 } }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    searchInput.text = "";
+                                    searchInput.forceActiveFocus();
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Theme list
                 ListView {
                     id: themeList
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    model: root.theme.themes
+                    model: root.filteredThemes
                     clip: true
                     spacing: 2
                     boundsBehavior: Flickable.StopAtBounds
-                    focus: true
                     currentIndex: root.selectedIndex
                     highlightMoveDuration: 150
                     highlightMoveVelocity: -1
@@ -167,7 +293,7 @@ Scope {
 
                             // Theme name
                             Text {
-                                text: delegateRoot.modelData.name
+                                text: delegateRoot.modelData.data.name
                                 color: root.selectedIndex === delegateRoot.index ? root.theme.textPrimary : root.theme.textSecondary
                                 font.pixelSize: 13
                                 font.family: "Hack Nerd Font"
@@ -185,11 +311,11 @@ Scope {
 
                                 Repeater {
                                     model: [
-                                        delegateRoot.modelData.bgBase,
-                                        delegateRoot.modelData.accentPrimary,
-                                        delegateRoot.modelData.accentGreen,
-                                        delegateRoot.modelData.accentOrange,
-                                        delegateRoot.modelData.accentRed
+                                        delegateRoot.modelData.data.bgBase,
+                                        delegateRoot.modelData.data.accentPrimary,
+                                        delegateRoot.modelData.data.accentGreen,
+                                        delegateRoot.modelData.data.accentOrange,
+                                        delegateRoot.modelData.data.accentRed
                                     ]
 
                                     Rectangle {
@@ -206,11 +332,11 @@ Scope {
 
                             // Checkmark for active theme
                             Text {
-                                text: root.theme.currentIndex === delegateRoot.index ? "" : ""
+                                text: ""
                                 color: root.theme.accentGreen
                                 font.pixelSize: 14
                                 font.family: "Hack Nerd Font"
-                                visible: root.theme.currentIndex === delegateRoot.index
+                                visible: root.theme.currentIndex === delegateRoot.modelData.originalIndex
                                 Layout.alignment: Qt.AlignVCenter
 
                                 Behavior on color { ColorAnimation { duration: 150 } }
@@ -223,29 +349,23 @@ Scope {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.theme.setTheme(delegateRoot.index);
+                                root.theme.setTheme(delegateRoot.modelData.originalIndex);
                                 themePanel.visible = false;
                             }
                             onEntered: root.selectedIndex = delegateRoot.index
                         }
                     }
 
-                    Keys.onEscapePressed: themePanel.visible = false
+                    // No results message
+                    Text {
+                        anchors.centerIn: parent
+                        text: "No themes found"
+                        color: root.theme.textMuted
+                        font.pixelSize: 13
+                        font.family: "Hack Nerd Font"
+                        visible: themeList.count === 0 && root.searchText !== ""
 
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Down) {
-                            event.accepted = true;
-                            root.selectedIndex = Math.min(root.selectedIndex + 1, themeList.count - 1);
-                            themeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
-                        } else if (event.key === Qt.Key_Up) {
-                            event.accepted = true;
-                            root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
-                            themeList.positionViewAtIndex(root.selectedIndex, ListView.Contain);
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            event.accepted = true;
-                            root.theme.setTheme(root.selectedIndex);
-                            themePanel.visible = false;
-                        }
+                        Behavior on color { ColorAnimation { duration: 150 } }
                     }
                 }
 
