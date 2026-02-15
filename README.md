@@ -1,19 +1,7 @@
 # my quickshell config
+a personal Hyprland desktop config built with [Quickshell](https://quickshell.outfoxxed.me/). it's nothing fancy — just a status bar, app launcher, notification daemon, and a theme switcher with 15 themes. each piece is its own module and works independently, so feel free to grab only the parts you need.
 
-this is my personal Hyprland desktop config built with [Quickshell](https://quickshell.outfoxxed.me/) — a status bar, app launcher, and notification daemon with a built-in theme switcher. modular architecture where each piece works independently.
-
-feel free to look around, borrow ideas, or use it as a starting point for your own. no pressure — it's just how i like my desktop.
-
-## what's in it
-
-- clock & date
-- hyprland workspace indicator
-- active window title
-- system info (cpu, memory, network, battery, temperature)
-- system tray
-- app launcher (rofi drun-style)
-- notification popups (dunst-style)
-- theme switcher (15 themes across 3 families)
+i hope it's helpful as a starting point or reference. if you have questions or ideas, don't hesitate to open an issue — happy to chat.
 
 <img width="1920" height="111" alt="image" src="https://github.com/user-attachments/assets/06d824ae-cf21-4c78-919c-1604f1c0a2dc" />
 <br/>
@@ -21,79 +9,94 @@ feel free to look around, borrow ideas, or use it as a starting point for your o
 <br/>
 <img width="601" height="495" alt="image" src="https://github.com/user-attachments/assets/40c46613-dc24-461a-9075-33ffea221716" />
 
-## structure
+## what's included
 
-```
-shell.qml                           # assembler — wires modules together
-bar/
-  Bar.qml                           # status bar layout (one per screen)
-  DefaultTheme.qml                  # standalone fallback colors
-  TimeWidget.qml                    # clock & date
-  WorkspaceIndicator.qml            # hyprland workspaces
-  WindowTitle.qml                   # active window
-  SystemInfoWidget.qml              # cpu/mem/net/bat/temp
-  SystemTrayWidget.qml              # system tray icons
-  Time.qml                          # singleton — clock data
-  SystemInfo.qml                    # singleton — cpu/mem/net/bat/temp
-app-launcher/
-  AppLauncher.qml                   # rofi drun-style overlay
-  DefaultTheme.qml
-notifications/
-  NotificationPopup.qml             # dunst-style popups
-  NotificationService.qml           # notification daemon (singleton)
-  DefaultTheme.qml
-theme-switcher/
-  ThemeSwitcher.qml                 # theme picker overlay
-  Theme.qml                         # 15 themes + persistence + kitty sync
-  DefaultTheme.qml
-docs/                               # PlantUML architecture diagrams
-```
+| Module | What it does |
+|--------|-------------|
+| **Bar** | clock, hyprland workspaces, active window title, system info (cpu/mem/net/bat/temp), system tray |
+| **App Launcher** | rofi drun-style application launcher |
+| **Notifications** | dunst-style notification daemon with popups |
+| **Theme Switcher** | 15 themes across 3 families, persists across restarts |
 
-each module is self-contained — no module imports another. `shell.qml` wires the shared theme from `theme-switcher/` into all modules via property injection. remove any module and the rest still work.
+## prerequisites
 
-## dependencies
+these are needed regardless of which modules you use:
 
 - [Quickshell](https://quickshell.outfoxxed.me/) + Qt 6
-- Hyprland
-- a Nerd Font (i use Hack Nerd Font)
-- `top`, `free`, `nmcli`, `sensors` for system info
+- [Hyprland](https://hyprland.org/)
+- a [Nerd Font](https://www.nerdfonts.com/) (i use Hack Nerd Font — swap it in the QML files if you prefer another)
 
-## running
+## installing everything
+
+if you'd like the full setup:
 
 ```bash
+git clone https://github.com/<your-username>/quickshell-config ~/.config/quickshell
 quickshell
 ```
 
-it reads from `~/.config/quickshell/` by default.
+that's it — quickshell reads from `~/.config/quickshell/` by default.
 
-## app launcher
+## installing individual modules
 
-a rofi drun-style launcher built into the shell. toggle it via IPC:
+each module is self-contained in its own folder with a `DefaultTheme.qml` fallback, so you can pick and choose. here's how to set up just the parts you want.
 
-```bash
-qs ipc call launcher toggle
+### bar
+
+the status bar — clock, workspaces, window title, system info, and system tray.
+
+**extra dependencies:** `top`, `free`, `nmcli`, `sensors`, `/sys/class/power_supply/`
+
+1. copy `bar/` into your quickshell config directory
+2. in your `shell.qml`, add:
+
+```qml
+import "bar" as Bar
+
+Bar.Bar {}
 ```
 
-bind it in `hyprland.conf`:
+the bar will use its built-in Tokyo Night Night colors by default. to wire it up with the theme switcher instead, pass `theme: yourThemeObject`.
+
+### app launcher
+
+a rofi drun-style launcher overlay. searches by name, description, keywords, and categories. keyboard navigation with arrow keys, enter, and escape.
+
+1. copy `app-launcher/` into your quickshell config directory
+2. in your `shell.qml`, add:
+
+```qml
+import "app-launcher" as Launcher
+
+Launcher.AppLauncher {}
+```
+
+3. bind a key in `hyprland.conf`:
 
 ```
 bind = SUPER, D, exec, qs ipc call launcher toggle
 ```
 
-features:
-- searches by app name, description, keywords, and categories
-- keyboard navigation (arrow keys, enter, escape)
-- click backdrop to dismiss
-
-## notifications
+### notifications
 
 a built-in notification daemon — replaces dunst/mako. popups appear in the top-right corner with urgency-based styling and auto-expire timers.
 
-IPC commands:
+**note:** only one notification daemon can own `org.freedesktop.Notifications` on D-Bus at a time. please stop dunst/mako before using this.
 
-```bash
-qs ipc call notifications dismiss_all   # dismiss all popups
-qs ipc call notifications dnd_toggle    # toggle do not disturb
+1. copy `notifications/` into your quickshell config directory
+2. in your `shell.qml`, add:
+
+```qml
+import "notifications" as Notif
+
+Notif.NotificationPopup {}
+```
+
+3. optionally bind IPC commands in `hyprland.conf`:
+
+```
+bind = SUPER, N, exec, qs ipc call notifications dismiss_all
+bind = SUPER SHIFT, N, exec, qs ipc call notifications dnd_toggle
 ```
 
 features:
@@ -105,17 +108,27 @@ features:
 - max 5 visible notifications at a time
 - do not disturb mode
 
-**note:** only one notification daemon can run on D-Bus at a time — stop dunst/mako before using this.
+### theme switcher
 
-## theme switcher
+a theme picker overlay with 15 themes across 3 families. selected theme persists across restarts and syncs with kitty terminal and system dark/light mode.
 
-a built-in theme picker with 15 themes across 3 families. toggle it via IPC:
+1. copy `theme-switcher/` into your quickshell config directory
+2. in your `shell.qml`, create the switcher and wire its theme into other modules:
 
-```bash
-qs ipc call theme toggle
+```qml
+import "theme-switcher" as TS
+
+TS.ThemeSwitcher {
+    id: ts
+}
+
+// then pass ts.theme into your other modules:
+// Bar { theme: ts.theme }
+// AppLauncher { theme: ts.theme }
+// NotificationPopup { theme: ts.theme }
 ```
 
-bind it in `hyprland.conf`:
+3. bind a key in `hyprland.conf`:
 
 ```
 bind = SUPER, T, exec, qs ipc call theme toggle
@@ -126,34 +139,14 @@ available themes:
 - **Catppuccin** — Mocha, Macchiato, Frappe, Latte
 - **Beared** — Arc, Surprising Eggplant, Oceanic, Solarized Dark, Coffee, Monokai Stone, Vivid Black
 
-features:
-- color swatches preview for each theme
-- keyboard navigation (arrow keys, enter, escape)
-- click backdrop to dismiss
-- selected theme persists across restarts (saved to `~/.config/quickshell/theme.conf`)
-- all components update instantly with smooth color transitions
-- syncs with kitty terminal and system dark/light mode
-
 ## tweaking
 
-- **colors** — all colors are in `theme-switcher/Theme.qml`. pick a theme via the switcher, or add your own by appending to the `themes` array.
-- **font** — search for `"Hack Nerd Font"` and swap it with yours.
+- **colors** — all colors live in `theme-switcher/Theme.qml`. pick a theme via the switcher, or add your own by appending to the `themes` array.
+- **font** — search for `"Hack Nerd Font"` in the QML files and swap it with yours.
 - **layout** — rearrange widgets in `bar/Bar.qml`.
 - **polling rate** — change the interval in `bar/SystemInfo.qml` (default 2s).
-- **adding a module** — create a folder with an entry QML file + `DefaultTheme.qml`, add `property var theme: DefaultTheme {}`, wire it in `shell.qml`.
+- **adding a module** — create a folder with an entry QML file + `DefaultTheme.qml`, add `property var theme: DefaultTheme {}`, and wire it in `shell.qml`.
 
-## docs
+## acknowledgments
 
-architecture diagrams live in `docs/` as PlantUML files:
-
-| Diagram | What it shows |
-|---------|---------------|
-| `architecture-overview.puml` | full system: modules, dependencies, theme wiring |
-| `theme-flow.puml` | how theme propagates from singleton through all modules |
-| `folder-structure.puml` | directory tree with role annotations |
-| `module-contracts.puml` | class diagram of DefaultTheme, Theme, entry points, widgets |
-| `ipc-commands.puml` | sequence diagram of all IPC commands |
-| `data-flow.puml` | how data flows from system/D-Bus/Hyprland into widgets |
-| `plug-unplug.puml` | activity diagram showing module independence |
-
-render with `plantuml docs/*.puml` or paste into [plantuml.com](https://www.plantuml.com/plantuml/uml/).
+this wouldn't exist without the wonderful work behind [Quickshell](https://quickshell.outfoxxed.me/), [Hyprland](https://hyprland.org/), and the theme communities — [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme), [Catppuccin](https://github.com/catppuccin/catppuccin), and [Beared Theme](https://marketplace.visualstudio.com/items?itemName=BeardedBear.beardedtheme). thank you all.
