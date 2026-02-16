@@ -8,7 +8,15 @@ Singleton {
     id: root
 
     property int currentIndex: 0
-    readonly property var current: themes[currentIndex]
+    property int previewIndex: -1
+    onPreviewIndexChanged: {
+        if (previewIndex >= 0 && previewIndex < themes.length) {
+            applyKittyTheme(themes[previewIndex]);
+        } else {
+            applyKittyTheme(themes[currentIndex]);
+        }
+    }
+    readonly property var current: previewIndex >= 0 && previewIndex < themes.length ? themes[previewIndex] : themes[currentIndex]
     readonly property int count: themes.length
     readonly property string currentName: current.name
     readonly property string currentFamily: current.family

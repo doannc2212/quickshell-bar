@@ -25,12 +25,20 @@ Scope {
                 }
                 themeList.positionViewAtIndex(selectedIndex, ListView.Center);
                 searchInput.forceActiveFocus();
+            } else {
+                root.theme.previewIndex = -1;
             }
         }
     }
 
     property int selectedIndex: 0
     property string searchText: ""
+
+    onSelectedIndexChanged: {
+        if (themePanel.visible && filteredThemes.length > 0 && selectedIndex >= 0 && selectedIndex < filteredThemes.length) {
+            root.theme.previewIndex = filteredThemes[selectedIndex].originalIndex;
+        }
+    }
 
     property var filteredThemes: {
         var query = searchText.toLowerCase();
@@ -66,7 +74,10 @@ Scope {
         // Dark overlay backdrop
         MouseArea {
             anchors.fill: parent
-            onClicked: themePanel.visible = false
+            onClicked: {
+                root.theme.previewIndex = -1;
+                themePanel.visible = false;
+            }
 
             Rectangle {
                 anchors.fill: parent
@@ -165,7 +176,10 @@ Scope {
                                     root.selectedIndex = 0;
                                 }
 
-                                Keys.onEscapePressed: themePanel.visible = false
+                                Keys.onEscapePressed: {
+                                    root.theme.previewIndex = -1;
+                                    themePanel.visible = false;
+                                }
 
                                 Keys.onPressed: event => {
                                     if (event.key === Qt.Key_Down) {
@@ -179,6 +193,7 @@ Scope {
                                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                         event.accepted = true;
                                         if (root.filteredThemes.length > 0) {
+                                            root.theme.previewIndex = -1;
                                             root.theme.setTheme(root.filteredThemes[root.selectedIndex].originalIndex);
                                             themePanel.visible = false;
                                         }
@@ -349,6 +364,7 @@ Scope {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
+                                root.theme.previewIndex = -1;
                                 root.theme.setTheme(delegateRoot.modelData.originalIndex);
                                 themePanel.visible = false;
                             }
