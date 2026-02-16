@@ -1,5 +1,5 @@
 # my quickshell config
-a personal Hyprland desktop config built with [Quickshell](https://quickshell.outfoxxed.me/). it's nothing fancy — just a status bar, app launcher, notification daemon, and a theme switcher with 15 themes. each piece is its own module and works independently, so feel free to grab only the parts you need.
+a personal Hyprland desktop config built with [Quickshell](https://quickshell.outfoxxed.me/). status bar, app launcher, notification daemon, wallpaper manager, and a theme switcher with 206 themes. each piece is its own module and works independently, so feel free to grab only the parts you need.
 
 i hope it's helpful as a starting point or reference. if you have questions or ideas, don't hesitate to open an issue — happy to chat.
 
@@ -13,10 +13,12 @@ i hope it's helpful as a starting point or reference. if you have questions or i
 
 | Module | What it does |
 |--------|-------------|
-| **Bar** | clock, hyprland workspaces, active window title, system info (cpu/mem/net/bat/temp), system tray |
+| **Bar** | clock, hyprland workspaces, active window title, system info (cpu/mem/net/bat/temp), system tray, media indicator |
 | **App Launcher** | rofi drun-style application launcher |
 | **Notifications** | dunst-style notification daemon with popups |
-| **Theme Switcher** | 15 themes across 3 families, persists across restarts |
+| **Theme Switcher** | 206 themes across 6 families, persists across restarts |
+| **Wallpaper Manager** | grid picker for wallpapers, preview, supports hyprpaper and swww |
+| **Plugins** | drop-in `.qml` plugin system |
 
 ## prerequisites
 
@@ -26,12 +28,17 @@ these are needed regardless of which modules you use:
 - [Hyprland](https://hyprland.org/)
 - a [Nerd Font](https://www.nerdfonts.com/) (i use Hack Nerd Font — swap it in the QML files if you prefer another)
 
+optional, depending on which modules you use:
+
+- `hyprpaper` or `swww` — for wallpaper manager
+- system monitoring tools: `top`, `free`, `nmcli`, `sensors`, `/sys/class/power_supply/`
+
 ## installing everything
 
 if you'd like the full setup:
 
 ```bash
-git clone https://github.com/<your-username>/quickshell-config ~/.config/quickshell
+git clone https://github.com/doannc2212/quickshell-config ~/.config/quickshell
 quickshell
 ```
 
@@ -43,7 +50,7 @@ each module is self-contained in its own folder with a `DefaultTheme.qml` fallba
 
 ### bar
 
-the status bar — clock, workspaces, window title, system info, and system tray.
+the status bar — clock, workspaces, window title, system info, system tray, and media indicator.
 
 **extra dependencies:** `top`, `free`, `nmcli`, `sensors`, `/sys/class/power_supply/`
 
@@ -110,7 +117,7 @@ features:
 
 ### theme switcher
 
-a theme picker overlay with 15 themes across 3 families. selected theme persists across restarts and syncs with kitty terminal and system dark/light mode.
+a theme picker overlay with 206 themes across 6 families. selected theme persists across restarts and syncs with kitty terminal and system dark/light mode.
 
 1. copy `theme-switcher/` into your quickshell config directory
 2. in your `shell.qml`, create the switcher and wire its theme into other modules:
@@ -125,7 +132,6 @@ TS.ThemeSwitcher {
 // then pass ts.theme into your other modules:
 // Bar { theme: ts.theme }
 // AppLauncher { theme: ts.theme }
-// NotificationPopup { theme: ts.theme }
 ```
 
 3. bind a key in `hyprland.conf`:
@@ -134,10 +140,48 @@ TS.ThemeSwitcher {
 bind = SUPER, T, exec, qs ipc call theme toggle
 ```
 
-available themes:
+available theme families:
 - **Tokyo Night** — Night, Storm, Moon, Light
 - **Catppuccin** — Mocha, Macchiato, Frappe, Latte
+- **Zen** — Dark, Light
+- **Arc** — Dark, Light
 - **Beared** — Arc, Surprising Eggplant, Oceanic, Solarized Dark, Coffee, Monokai Stone, Vivid Black
+- **MonkeyType** — 187 community themes
+
+### wallpaper manager
+
+a grid-based wallpaper picker that scans `~/Pictures/Wallpapers` and `~/Pictures`. click to apply, right-click to preview. auto-detects swww or hyprpaper as backend. persists current wallpaper to `wallpaper.conf`.
+
+**extra dependencies:** `hyprpaper` or `swww`
+
+1. copy `wallpaper/` into your quickshell config directory
+2. in your `shell.qml`, add:
+
+```qml
+import "wallpaper" as WP
+
+WP.WallpaperManager {}
+```
+
+3. bind a key in `hyprland.conf`:
+
+```
+bind = SUPER, W, exec, qs ipc call wallpaper toggle
+```
+
+### plugins
+
+drop `.qml` files into `~/.config/quickshell/plugins/` and they'll be loaded automatically on startup. each plugin should be a `Scope` with `property var theme` to receive theme injection.
+
+example plugin (`plugins/my-widget.qml`):
+```qml
+import Quickshell
+
+Scope {
+    property var theme
+    // your custom widget here
+}
+```
 
 ## tweaking
 
@@ -149,4 +193,4 @@ available themes:
 
 ## acknowledgments
 
-this wouldn't exist without the wonderful work behind [Quickshell](https://quickshell.outfoxxed.me/), [Hyprland](https://hyprland.org/), and the theme communities — [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme), [Catppuccin](https://github.com/catppuccin/catppuccin), and [Beared Theme](https://marketplace.visualstudio.com/items?itemName=BeardedBear.beardedtheme). thank you all.
+this wouldn't exist without the wonderful work behind [Quickshell](https://quickshell.outfoxxed.me/), [Hyprland](https://hyprland.org/), and the theme communities — [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme), [Catppuccin](https://github.com/catppuccin/catppuccin), [Beared Theme](https://marketplace.visualstudio.com/items?itemName=BeardedBear.beardedtheme), and [MonkeyType](https://monkeytype.com/). thank you all.

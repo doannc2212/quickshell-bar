@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell.Hyprland
 import Quickshell.Widgets
 import Quickshell.Services.SystemTray
+import Quickshell.Services.Mpris
 
 Scope {
   id: root
@@ -106,6 +107,52 @@ Scope {
 
         Item {
           Layout.fillWidth: true
+        }
+
+        // Media indicator pill
+        Rectangle {
+          height: 24
+          width: mediaPill.width + 16
+          radius: 12
+          color: root.theme.bgSurface
+          visible: Mpris.players.count > 0
+
+          Row {
+            id: mediaPill
+            anchors.centerIn: parent
+            spacing: 6
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              text: Mpris.players.count > 0 && Mpris.players.values[0] && Mpris.players.values[0].isPlaying ? "󰐊" : "󰏤"
+              color: root.theme.accentPrimary
+              font.pixelSize: 14
+              font.family: "Hack Nerd Font"
+            }
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              text: {
+                if (Mpris.players.count === 0) return "";
+                const p = Mpris.players.values[0];
+                if (!p) return "";
+                const parts = [];
+                if (p.trackArtist) parts.push(p.trackArtist);
+                if (p.trackTitle) parts.push(p.trackTitle);
+                const str = parts.join(" - ");
+                return str.length > 30 ? str.substring(0, 30) + "..." : str;
+              }
+              color: root.theme.textPrimary
+              font.pixelSize: 11
+              font.family: "Hack Nerd Font"
+            }
+          }
+
+          MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: Quickshell.execDetached({ command: ["sh", "-c", "qs ipc call media toggle"] })
+          }
         }
 
         // System Info
