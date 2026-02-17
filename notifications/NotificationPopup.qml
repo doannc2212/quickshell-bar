@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Widgets
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import QtQuick
@@ -114,23 +115,37 @@ Scope {
                 spacing: 8
 
                 // App icon
-                Text {
-                  text: {
-                    if (modelData.urgency === NotificationUrgency.Critical) return "󰀦";
-                    if (modelData.appName.toLowerCase().includes("discord")) return "󰙯";
-                    if (modelData.appName.toLowerCase().includes("firefox")) return "󰈹";
-                    if (modelData.appName.toLowerCase().includes("chrome")) return "";
-                    if (modelData.appName.toLowerCase().includes("telegram")) return "";
-                    if (modelData.appName.toLowerCase().includes("spotify")) return "󰓇";
-                    if (modelData.appName.toLowerCase().includes("terminal") ||
-                        modelData.appName.toLowerCase().includes("kitty") ||
-                        modelData.appName.toLowerCase().includes("alacritty")) return "";
-                    return "󰂚";
-                  }
-                  color: modelData.urgency === NotificationUrgency.Critical ? root.theme.urgencyCritical : root.theme.urgencyNormal
-                  font.pixelSize: 14
-                  font.family: "Hack Nerd Font"
+                Item {
+                  Layout.preferredWidth: 16
+                  Layout.preferredHeight: 16
                   Layout.alignment: Qt.AlignVCenter
+
+                  IconImage {
+                    anchors.centerIn: parent
+                    source: Quickshell.iconPath(notifCard.modelData.appIcon, true)
+                    implicitSize: 16
+                    visible: notifCard.modelData.appIcon !== ""
+                  }
+
+                  Text {
+                    anchors.centerIn: parent
+                    visible: notifCard.modelData.appIcon === ""
+                    text: {
+                      if (notifCard.modelData.urgency === NotificationUrgency.Critical) return "󰀦";
+                      if (notifCard.modelData.appName.toLowerCase().includes("discord")) return "󰙯";
+                      if (notifCard.modelData.appName.toLowerCase().includes("firefox")) return "󰈹";
+                      if (notifCard.modelData.appName.toLowerCase().includes("chrome")) return "";
+                      if (notifCard.modelData.appName.toLowerCase().includes("telegram")) return "";
+                      if (notifCard.modelData.appName.toLowerCase().includes("spotify")) return "󰓇";
+                      if (notifCard.modelData.appName.toLowerCase().includes("terminal") ||
+                          notifCard.modelData.appName.toLowerCase().includes("kitty") ||
+                          notifCard.modelData.appName.toLowerCase().includes("alacritty")) return "";
+                      return "󰂚";
+                    }
+                    color: notifCard.modelData.urgency === NotificationUrgency.Critical ? root.theme.urgencyCritical : root.theme.urgencyNormal
+                    font.pixelSize: 14
+                    font.family: "Hack Nerd Font"
+                  }
                 }
 
                 Text {
@@ -181,18 +196,41 @@ Scope {
                 visible: text !== ""
               }
 
-              // Body
-              Text {
-                text: modelData.body || ""
-                color: root.theme.textSecondary
-                font.pixelSize: 12
-                font.family: "Hack Nerd Font"
-                wrapMode: Text.Wrap
-                maximumLineCount: 3
-                elide: Text.ElideRight
+              // Body + image thumbnail
+              RowLayout {
                 Layout.fillWidth: true
-                visible: text !== ""
-                textFormat: Text.PlainText
+                spacing: 8
+                visible: (modelData.body || "") !== "" || modelData.image !== ""
+
+                Text {
+                  text: modelData.body || ""
+                  color: root.theme.textSecondary
+                  font.pixelSize: 12
+                  font.family: "Hack Nerd Font"
+                  wrapMode: Text.Wrap
+                  maximumLineCount: 3
+                  elide: Text.ElideRight
+                  Layout.fillWidth: true
+                  visible: text !== ""
+                  textFormat: Text.PlainText
+                }
+
+                Rectangle {
+                  Layout.preferredWidth: 48
+                  Layout.preferredHeight: 48
+                  radius: 6
+                  color: "transparent"
+                  clip: true
+                  visible: notifCard.modelData.image !== ""
+
+                  Image {
+                    anchors.fill: parent
+                    source: notifCard.modelData.image
+                    fillMode: Image.PreserveAspectCrop
+                    sourceSize.width: 48
+                    sourceSize.height: 48
+                  }
+                }
               }
 
               // Action buttons
