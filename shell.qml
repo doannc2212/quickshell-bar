@@ -12,6 +12,8 @@ import "app-launcher"
 import "notifications"
 import "theme-switcher"
 import "wallpaper"
+import "media"
+import "osd"
 
 Scope {
   ThemeSwitcher { id: ts }
@@ -19,4 +21,6 @@ Scope {
   AppLauncher { theme: ts.theme }
   NotificationPopup { theme: ts.theme }
   WallpaperManager { theme: ts.theme }
+  MediaControl { theme: ts.theme }
+  OSD { theme: ts.theme }
 }

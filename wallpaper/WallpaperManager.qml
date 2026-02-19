@@ -112,6 +112,8 @@ Scope {
             height: 28
             radius: 14
             color: refreshHover.containsMouse ? root.theme.bgHover : "transparent"
+            Accessible.role: Accessible.Button
+            Accessible.name: "Refresh wallpaper list"
 
             Text {
               anchors.centerIn: parent
@@ -163,6 +165,8 @@ Scope {
               font.family: "Hack Nerd Font"
               clip: true
               selectByMouse: true
+              Accessible.role: Accessible.EditableText
+              Accessible.name: "Search wallpapers"
               onTextChanged: root.searchText = text
 
               Keys.onEscapePressed: {
@@ -198,6 +202,9 @@ Scope {
           delegate: Item {
             required property string modelData
             required property int index
+
+            Accessible.role: Accessible.Button
+            Accessible.name: modelData.split("/").pop() + (WallpaperService.currentWallpaper === modelData ? ", current wallpaper" : "")
 
             width: wallpaperGrid.cellWidth
             height: wallpaperGrid.cellHeight
@@ -366,6 +373,8 @@ Scope {
         height: 40
         radius: 20
         color: root.theme.accentPrimary
+        Accessible.role: Accessible.Button
+        Accessible.name: "Apply wallpaper"
 
         Row {
           id: applyRow

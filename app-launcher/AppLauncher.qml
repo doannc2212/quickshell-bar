@@ -145,6 +145,8 @@ Scope {
               font.family: "Hack Nerd Font"
               clip: true
               focus: true
+              Accessible.role: Accessible.EditableText
+              Accessible.name: "Search applications"
 
               Text {
                 anchors.fill: parent
@@ -224,6 +226,9 @@ Scope {
             id: delegateRoot
             required property var modelData
             required property int index
+
+            Accessible.role: Accessible.Button
+            Accessible.name: (modelData.name ?? "Application") + (modelData.genericName ? " - " + modelData.genericName : "")
 
             width: resultsList.width
             height: 44

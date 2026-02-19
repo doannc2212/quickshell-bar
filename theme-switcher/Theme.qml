@@ -66,8 +66,7 @@ Singleton {
     function setTheme(index) {
         if (index >= 0 && index < themes.length) {
             currentIndex = index;
-            saveProc.command = ["sh", "-c",
-                "echo " + index + " > $HOME/.config/quickshell/theme.conf"];
+            saveProc.command = ["sh", "-c", 'printf "%s" "$1" > "$HOME/.config/quickshell/theme.conf"', "sh", String(index)];
             saveProc.running = true;
             applyKittyTheme(themes[index]);
             applySystemColorScheme(!isLightColor(themes[index].bgBase));

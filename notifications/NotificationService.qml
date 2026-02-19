@@ -20,9 +20,9 @@ Singleton {
     keepOnReload: false
 
     onNotification: notification => {
-      notification.tracked = true;
-
       if (root.doNotDisturb) return;
+
+      notification.tracked = true;
 
       root.notifications = [notification, ...root.notifications];
 

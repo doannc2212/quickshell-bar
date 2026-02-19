@@ -65,6 +65,11 @@ Scope {
             required property Notification modelData
             required property int index
 
+            Accessible.role: Accessible.StaticText
+            Accessible.name: (modelData.urgency === NotificationUrgency.Critical ? "[Critical] " :
+                             modelData.urgency === NotificationUrgency.Low ? "[Low] " : "") +
+                             (modelData.appName || "Notification") + ": " + (modelData.summary || "")
+
             Layout.fillWidth: true
             Layout.preferredHeight: cardContent.implicitHeight + 24
             radius: 12
@@ -165,6 +170,8 @@ Scope {
                   radius: 10
                   color: closeHover.containsMouse ? root.theme.bgBorder : "transparent"
                   Layout.alignment: Qt.AlignVCenter
+                  Accessible.role: Accessible.Button
+                  Accessible.name: "Dismiss notification"
 
                   Text {
                     anchors.centerIn: parent
@@ -245,6 +252,9 @@ Scope {
                   Rectangle {
                     id: actionBtn
                     required property NotificationAction modelData
+
+                    Accessible.role: Accessible.Button
+                    Accessible.name: modelData.text
 
                     Layout.preferredHeight: 26
                     Layout.preferredWidth: actionText.width + 16

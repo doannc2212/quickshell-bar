@@ -9,7 +9,7 @@ Singleton {
 
   property string cpuUsage: "0%"
   property string memoryUsage: "0%"
-  property string networkInfo: "7F-Internal"
+  property string networkInfo: "Disconnected"
   property int batteryLevelRaw: 0
   property string batteryLevel: "0%"
   property string batteryIcon: "󰂎"
@@ -50,7 +50,7 @@ Singleton {
     stdout: StdioCollector {
       onStreamFinished: {
         const ssid = text.trim()
-        root.networkInfo = ssid || "7F-Internal"
+        root.networkInfo = ssid || "Disconnected"
       }
     }
   }
@@ -85,12 +85,12 @@ Singleton {
   // Temperature
   Process {
     id: tempProc
-    command: ["sh", "-c", "sensors 2>/dev/null | grep -i 'Package id 0' | awk '{print $4}' | sed 's/+//;s/°C/°C/' || echo '61°C'"]
+    command: ["sh", "-c", "sensors 2>/dev/null | grep -i 'Package id 0' | awk '{print $4}' | sed 's/+//;s/°C/°C/' || echo 'N/A'"]
     running: true
 
     stdout: StdioCollector {
       onStreamFinished: {
-        root.temperature = text.trim() || "61°C"
+        root.temperature = text.trim() || "N/A"
       }
     }
   }

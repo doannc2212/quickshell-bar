@@ -25,10 +25,4 @@ QtObject {
   readonly property color batteryWarning: accentOrange
   readonly property color batteryCritical: accentRed
 
-  readonly property var themes: []
-  readonly property int currentIndex: 0
-  readonly property string currentName: "Night"
-  readonly property string currentFamily: "Tokyo Night"
-  readonly property int count: 0
-  function setTheme(index) {}
 }

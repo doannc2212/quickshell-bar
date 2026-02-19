@@ -1,16 +1,24 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Hyprland
 import Quickshell.Widgets
 import Quickshell.Services.SystemTray
 import Quickshell.Services.Mpris
-
 Scope {
   id: root
   property var theme: DefaultTheme {}
   property bool barVisible: true
+
+  // MPRIS active player
+  property var activePlayer: {
+    const players = Mpris.players.values;
+    if (!players || players.length === 0) return null;
+    for (const p of players) {
+      if (p.playbackState === MprisPlaybackState.Playing) return p;
+    }
+    return players[0];
+  }
 
   IpcHandler {
     target: "bar"
@@ -90,6 +98,9 @@ Scope {
               required property var modelData
               property bool urgentBlink: false
 
+              Accessible.role: Accessible.Button
+              Accessible.name: "Workspace " + modelData.id + (modelData.focused ? ", active" : "") + (modelData.urgent ? ", urgent" : "")
+
               width: modelData.focused ? 32 : 24
               height: 24
               radius: 12
@@ -133,6 +144,58 @@ Scope {
           }
         }
 
+        // Now Playing
+        Rectangle {
+          height: 24
+          width: nowPlayingContent.width + 16
+          radius: 12
+          color: root.theme.bgSurface
+          visible: root.activePlayer !== null
+
+          Accessible.role: Accessible.Button
+          Accessible.name: {
+            if (!root.activePlayer) return "No media";
+            const artist = root.activePlayer.trackArtist || "";
+            const title = root.activePlayer.trackTitle || "";
+            return "Now playing: " + (artist ? artist + " - " : "") + title;
+          }
+
+          Row {
+            id: nowPlayingContent
+            anchors.centerIn: parent
+            spacing: 6
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              text: root.activePlayer && root.activePlayer.isPlaying ? "󰐊" : "󰏤"
+              color: root.theme.accentPrimary
+              font.pixelSize: 14
+              font.family: "Hack Nerd Font"
+            }
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              text: {
+                if (!root.activePlayer) return "";
+                const artist = root.activePlayer.trackArtist || "";
+                const title = root.activePlayer.trackTitle || "";
+                return artist ? artist + " - " + title : title;
+              }
+              color: root.theme.textPrimary
+              font.pixelSize: 11
+              font.family: "Hack Nerd Font"
+              elide: Text.ElideRight
+              width: Math.min(implicitWidth, 200)
+            }
+          }
+
+          MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.activePlayer.togglePlaying()
+          }
+        }
+
         Item {
           Layout.fillWidth: true
         }
@@ -155,6 +218,8 @@ Scope {
             width: cpuContent.width + 12
             radius: 12
             color: root.theme.bgSurface
+            Accessible.role: Accessible.StaticText
+            Accessible.name: "CPU: " + SystemInfo.cpuUsage
 
             Row {
               id: cpuContent
@@ -184,6 +249,8 @@ Scope {
             width: memContent.width + 12
             radius: 12
             color: root.theme.bgSurface
+            Accessible.role: Accessible.StaticText
+            Accessible.name: "Memory: " + SystemInfo.memoryUsage
 
             Row {
               id: memContent
@@ -213,6 +280,8 @@ Scope {
             width: netContent.width + 12
             radius: 12
             color: root.theme.bgSurface
+            Accessible.role: Accessible.StaticText
+            Accessible.name: "Network: " + SystemInfo.networkInfo
 
             Row {
               id: netContent
@@ -242,6 +311,8 @@ Scope {
             width: battContent.width + 12
             radius: 12
             color: root.theme.bgSurface
+            Accessible.role: Accessible.StaticText
+            Accessible.name: "Battery: " + SystemInfo.batteryLevel
 
             Row {
               id: battContent
@@ -271,6 +342,8 @@ Scope {
             width: tempContent.width + 12
             radius: 12
             color: root.theme.bgSurface
+            Accessible.role: Accessible.StaticText
+            Accessible.name: "Temperature: " + SystemInfo.temperature
 
             Row {
               id: tempContent
@@ -313,6 +386,9 @@ Scope {
               MouseArea {
                 id: trayDelegate
                 required property SystemTrayItem modelData
+
+                Accessible.role: Accessible.Button
+                Accessible.name: modelData.tooltipTitle || modelData.title || "System tray item"
 
                 Layout.preferredWidth: 24
                 Layout.preferredHeight: 24
@@ -359,6 +435,8 @@ Scope {
 
       // Center window title independently
       Text {
+        Accessible.role: Accessible.StaticText
+        Accessible.name: "Active window: " + text
         text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
         color: root.theme.textPrimary
         font.pixelSize: 13

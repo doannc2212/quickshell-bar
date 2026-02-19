@@ -50,13 +50,13 @@ Singleton {
   function setWallpaper(path) {
     currentWallpaper = path;
 
-    setProcess.command = ["sh", "-c",
-      "awww img '" + path + "' --transition-type grow --transition-pos center --transition-duration 1"
-    ];
+    setProcess.command = ["awww", "img", path,
+      "--transition-type", "grow", "--transition-pos", "center",
+      "--transition-duration", "1"];
     setProcess.running = true;
 
     // Save to config
-    saveProcess.command = ["sh", "-c", "echo '" + path + "' > ~/.config/quickshell/wallpaper.conf"];
+    saveProcess.command = ["sh", "-c", 'printf "%s" "$1" > "$HOME/.config/quickshell/wallpaper.conf"', "sh", path];
     saveProcess.running = true;
   }
 
