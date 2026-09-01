@@ -12,6 +12,7 @@ Singleton {
     property bool wallpaperFeatureEnabled: true
     property bool wallpaperMode: false
     property var wallpaperTheme: ({})
+    property string configFormat: "conf" // "conf" or "lua" — which hyprland.* is active
     onPreviewIndexChanged: {
         if (previewIndex >= 0 && previewIndex < themes.length) {
             applyKittyTheme(themes[previewIndex]);
@@ -79,9 +80,11 @@ Singleton {
     function applyHyprlandBorders(t) {
         var active = hexToRgba(t.accentPrimary) + " " + hexToRgba(t.accentCyan) + " 45deg";
         var inactive = hexToRgba(t.bgBorder);
+        var writeCmd = root.configFormat === "lua"
+            ? "printf 'hl.config({\\n    general = {\\n        [\"col.active_border\"] = \"" + active + "\",\\n        [\"col.inactive_border\"] = \"" + inactive + "\",\\n    },\\n})\\n' > \"$HOME/.config/hypr/theme-borders.lua\""
+            : 'printf "general {\\n    col.active_border = ' + active + '\\n    col.inactive_border = ' + inactive + '\\n}\\n" > "$HOME/.config/hypr/theme-borders.conf"';
         hyprlandProc.command = ["sh", "-c",
-            'printf "general {\\n    col.active_border = ' + active + '\\n    col.inactive_border = ' + inactive + '\\n}\\n"' +
-            ' > "$HOME/.config/hypr/theme-borders.conf" && ' +
+            writeCmd + ' && ' +
             'hyprctl keyword general:col.active_border "' + active + '" && ' +
             'hyprctl keyword general:col.inactive_border "' + inactive + '"'
         ];
@@ -198,6 +201,20 @@ Singleton {
     Process { id: kittyProc; running: false }
     Process { id: colorSchemeProc; running: false }
     Process { id: hyprlandProc; running: false }
+
+    // Which hyprland.* is active — hyprland.lua wins exclusively if present, per
+    // Hyprland's own startup precedence (see monitor-manager/MonitorService.qml for the twin check).
+    Process {
+        id: configFormatCheck
+        command: ["sh", "-c",
+            "[ -f \"$HOME/.config/hypr/hyprland.lua\" ] && echo lua || echo conf"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.configFormat = text.trim() === "lua" ? "lua" : "conf";
+            }
+        }
+    }
 
     Process {
         id: loadProc
