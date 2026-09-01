@@ -3,7 +3,7 @@ a personal Hyprland desktop config built with [Quickshell](https://quickshell.ou
 
 i hope it's helpful as a starting point or reference. if you have questions or ide
 
-as, don't hesitate to open an issue — happy to chat.
+as, don't hesitate to open an issue - happy to chat.
 
 <img width="1920" height="111" alt="image" src="https://github.com/user-attachments/assets/06d824ae-cf21-4c78-919c-1604f1c0a2dc" />
 <br/>
@@ -26,6 +26,7 @@ https://github.com/user-attachments/assets/55c47c05-34b6-402c-aea7-42a369b86828
 | **Theme Switcher** | 206 themes across 6 families, persists across restarts, or follow your wallpaper |
 | **Wallpaper Manager** | grid picker for wallpapers, preview, supports hyprpaper and swww |
 | **Monitor Manager** | visual `hyprctl` front-end for arranging, scaling, rotating, mirroring, and disabling displays |
+| **Caffeine Toggle** | keeps the screen from locking or dimming while it's on - a corner badge you switch on for stretches where you're reading more than typing |
 
 ## prerequisites
 
@@ -33,16 +34,16 @@ these are needed regardless of which modules you use:
 
 - [Quickshell](https://quickshell.outfoxxed.me/) + Qt 6
 - [Hyprland](https://hyprland.org/)
-- a [Nerd Font](https://www.nerdfonts.com/) (i use Hack Nerd Font — swap it in the QML files if you prefer another)
+- a [Nerd Font](https://www.nerdfonts.com/) (i use Hack Nerd Font - swap it in the QML files if you prefer another)
 
 optional, depending on which modules you use:
 
-- `brightnessctl` — for brightness display and control in the bar and OSD
-- `nmcli` — for wifi network info in the bar
-- `/sys/class/power_supply/` — for battery info (standard on most laptops)
-- `hyprpaper` or `swww` — for the wallpaper manager
-- `matugen` or `wallust` — for generating a theme from your wallpaper
-- `hyprctl` / Hyprland — for the monitor manager
+- `brightnessctl` - for brightness display and control in the bar and OSD
+- `nmcli` - for wifi network info in the bar
+- `/sys/class/power_supply/` - for battery info (standard on most laptops)
+- `hyprpaper` or `swww` - for the wallpaper manager
+- `matugen` or `wallust` - for generating a theme from your wallpaper
+- `hyprctl` / Hyprland - for the monitor manager
 
 ## installing everything
 
@@ -53,7 +54,7 @@ git clone https://github.com/doannc2212/quickshell-config ~/.config/quickshell
 quickshell
 ```
 
-that's it — quickshell reads from `~/.config/quickshell/` by default.
+that's it - quickshell reads from `~/.config/quickshell/` by default.
 
 ## installing individual modules
 
@@ -61,7 +62,7 @@ each module is self-contained in its own folder with a `DefaultTheme.qml` fallba
 
 ### bar
 
-the status bar — clock, workspaces, window title, volume, brightness, network, battery, system tray, and a now-playing indicator.
+the status bar - clock, workspaces, window title, volume, brightness, network, battery, system tray, and a now-playing indicator.
 
 **extra dependencies:** `brightnessctl`, `nmcli`, `/sys/class/power_supply/`
 
@@ -102,7 +103,7 @@ bind = SUPER, D, exec, qs ipc call launcher toggle
 
 ### notifications
 
-a built-in notification daemon — replaces dunst/mako. popups appear in the top-right corner with urgency-based styling and auto-expire timers.
+a built-in notification daemon - replaces dunst/mako. popups appear in the top-right corner with urgency-based styling and auto-expire timers.
 
 **note:** only one notification daemon can own `org.freedesktop.Notifications` on D-Bus at a time. please stop dunst/mako before using this.
 
@@ -146,7 +147,7 @@ import "osd"
 OSD {}
 ```
 
-no IPC needed — it reacts automatically to PipeWire volume changes and backlight changes.
+no IPC needed - it reacts automatically to PipeWire volume changes and backlight changes.
 
 ### theme switcher
 
@@ -184,18 +185,18 @@ include theme-colors.conf
 ```
 
 available theme families:
-- **Tokyo Night** — Night, Storm, Moon, Light
-- **Catppuccin** — Mocha, Macchiato, Frappe, Latte
-- **Zen** — Dark, Light
-- **Arc** — Dark, Light
-- **Beared** — Arc, Surprising Eggplant, Oceanic, Solarized Dark, Coffee, Monokai Stone, Vivid Black
-- **MonkeyType** — 187 community themes
+- **Tokyo Night** - Night, Storm, Moon, Light
+- **Catppuccin** - Mocha, Macchiato, Frappe, Latte
+- **Zen** - Dark, Light
+- **Arc** - Dark, Light
+- **Beared** - Arc, Surprising Eggplant, Oceanic, Solarized Dark, Coffee, Monokai Stone, Vivid Black
+- **MonkeyType** - 187 community themes
 
 #### theme from wallpaper
 
 the switcher can generate a theme from an image instead of using a curated one.
 
-**extra dependencies:** [`matugen`](https://github.com/InioX/matugen) *or* [`wallust`](https://codeberg.org/explosion-mental/wallust) — auto-detected (force one with `WALLPAPER_THEME_TOOL=matugen|wallust`).
+**extra dependencies:** [`matugen`](https://github.com/InioX/matugen) *or* [`wallust`](https://codeberg.org/explosion-mental/wallust) - auto-detected (force one with `WALLPAPER_THEME_TOOL=matugen|wallust`).
 
 generate a palette from an image and switch to it:
 
@@ -258,22 +259,48 @@ features:
 - visual layout canvas with drag-to-arrange monitors
 - per-output resolution, scale, rotation, position, enable/disable, and mirror controls
 
+### caffeine toggle
+
+a small toggle that keeps the screen from locking or dimming while it's switched on. i added this for the stretches where i'm mostly reading rather than typing (vibe-coding?) - long enough that the lock screen would otherwise kick in when i'd rather it didn't. it shows up as a small badge in the corner only while it's active, so the rest of the time it's out of the way.
+
+no extra dependencies - it wraps Quickshell's own `IdleInhibitor` type, which talks directly to the Wayland `idle-inhibit` protocol Hyprland already supports. nothing external to install or accidentally leave running.
+
+1. copy `idle-inhibitor/` into your quickshell config directory
+2. in your `shell.qml`, add:
+
+```qml
+import "idle-inhibitor"
+
+CaffeineToggle {}
+```
+
+3. bind a key in `hyprland.conf`:
+
+```
+bind = SUPER, C, exec, qs ipc call idle toggle
+```
+
+features:
+- corner badge that fades in only while active, and fades back out a couple seconds after you toggle it
+- click the badge to turn it off without reaching for the keybind
+- deliberately doesn't persist across restarts - i'd rather re-toggle it once in a while than have a shell crash quietly leave the screen from sleeping forever
+
 ## tweaking
 
-- **colors** — all colors live in `theme-switcher/Theme.qml`. pick a theme via the switcher, or add your own by appending to the `themes` array.
-- **font** — edit the default `font: "Your Font"` at the top of the entry file.   
-- **layout** — rearrange widgets in `bar/Bar.qml`.
-- **polling rate** — change the interval in `bar/SystemInfo.qml` (default 2s).
-- **extra bar widgets** — CPU, memory, and temperature widgets are already written in `bar/Bar.qml` but commented out. uncomment them if you'd like them back (requires `top`, `free`, and `sensors`).
-- **adding a module** — create a folder with an entry QML file + `DefaultTheme.qml`, add `property var theme: DefaultTheme {}`, and wire it in `shell.qml`.
+- **colors** - all colors live in `theme-switcher/Theme.qml`. pick a theme via the switcher, or add your own by appending to the `themes` array.
+- **font** - edit the default `font: "Your Font"` at the top of the entry file.   
+- **layout** - rearrange widgets in `bar/Bar.qml`.
+- **polling rate** - change the interval in `bar/SystemInfo.qml` (default 2s).
+- **extra bar widgets** - CPU, memory, and temperature widgets are already written in `bar/Bar.qml` but commented out. uncomment them if you'd like them back (requires `top`, `free`, and `sensors`).
+- **adding a module** - create a folder with an entry QML file + `DefaultTheme.qml`, add `property var theme: DefaultTheme {}`, and wire it in `shell.qml`.
 
 ## acknowledgments
 
 this wouldn't exist without the wonderful work behind [Quickshell](https://quickshell.outfoxxed.me/), [Hyprland](https://hyprland.org/), and the theme creators:
 
-- [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme) by enkia — 4 themes (Night, Storm, Moon, Light)
-- [Catppuccin](https://github.com/catppuccin/catppuccin) by the Catppuccin team — 4 themes (Mocha, Macchiato, Frappe, Latte)
-- [Beared Theme](https://marketplace.visualstudio.com/items?itemName=BeardedBear.beardedtheme) by BeardedBear — 7 themes
-- [MonkeyType](https://monkeytype.com/) — 187 community themes. colors were derived from MonkeyType's theme palette. all credit goes to the original theme creators and the MonkeyType community contributors.
+- [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme) by enkia - 4 themes (Night, Storm, Moon, Light)
+- [Catppuccin](https://github.com/catppuccin/catppuccin) by the Catppuccin team - 4 themes (Mocha, Macchiato, Frappe, Latte)
+- [Beared Theme](https://marketplace.visualstudio.com/items?itemName=BeardedBear.beardedtheme) by BeardedBear - 7 themes
+- [MonkeyType](https://monkeytype.com/) - 187 community themes. colors were derived from MonkeyType's theme palette. all credit goes to the original theme creators and the MonkeyType community contributors.
 
 thank you all.

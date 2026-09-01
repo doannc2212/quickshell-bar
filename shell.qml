@@ -14,6 +14,7 @@ import "theme-switcher"
 import "wallpaper"
 import "osd"
 import "monitor-manager"
+import "idle-inhibitor"
 
 Scope {
   ThemeSwitcher { id: ts }
@@ -23,4 +24,5 @@ Scope {
   WallpaperManager { theme: ts.theme }
   OSD { theme: ts.theme }
   MonitorManager { theme: ts.theme }
+  CaffeineToggle { theme: ts.theme }
 }
