@@ -87,7 +87,7 @@ Scope {
 
       Text {
         anchors.centerIn: parent
-        text: root.active ? "󰛊" : "󰤄"
+        text: root.active ? "" : ""
         color: root.active ? root.theme.accentOrange : root.theme.textMuted
         font.pixelSize: 16
         font.family: root.font
