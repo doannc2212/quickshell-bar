@@ -78,10 +78,13 @@ Singleton {
     }
 
     function applyHyprlandBorders(t) {
-        var active = hexToRgba(t.accentPrimary) + " " + hexToRgba(t.accentCyan) + " 45deg";
+        var activeColor1 = hexToRgba(t.accentPrimary);
+        var activeColor2 = hexToRgba(t.accentCyan);
+        var angle = 45;
+        var active = activeColor1 + " " + activeColor2 + " " + angle + "deg";
         var inactive = hexToRgba(t.bgBorder);
         var writeCmd = root.configFormat === "lua"
-            ? "printf 'hl.config({\\n    general = {\\n        [\"col.active_border\"] = \"" + active + "\",\\n        [\"col.inactive_border\"] = \"" + inactive + "\",\\n    },\\n})\\n' > \"$HOME/.config/hypr/theme-borders.lua\""
+            ? "printf 'hl.config({\\n    general = {\\n        [\"col.active_border\"] = { colors = { \"" + activeColor1 + "\", \"" + activeColor2 + "\" }, angle = " + angle + " },\\n        [\"col.inactive_border\"] = \"" + inactive + "\",\\n    },\\n})\\n' > \"$HOME/.config/hypr/theme-borders.lua\""
             : 'printf "general {\\n    col.active_border = ' + active + '\\n    col.inactive_border = ' + inactive + '\\n}\\n" > "$HOME/.config/hypr/theme-borders.conf"';
         hyprlandProc.command = ["sh", "-c",
             writeCmd + ' && ' +
