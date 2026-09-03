@@ -481,8 +481,8 @@ Scope {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 root.theme.previewIndex = -1;
-                                root.theme.setTheme(delegateRoot.modelData.originalIndex);
                                 themePanel.visible = false;
+                                root.theme.setTheme(delegateRoot.modelData.originalIndex);
                             }
                             onEntered: root.selectedIndex = delegateRoot.index
                         }
