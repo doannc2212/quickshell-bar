@@ -13,6 +13,13 @@ Singleton {
     property bool wallpaperMode: false
     property var wallpaperTheme: ({})
     property string configFormat: "conf" // "conf" or "lua" — which hyprland.* is active
+    property bool configFormatReady: false
+    property bool themesReady: false
+
+    function tryLoadTheme() {
+        if (root.configFormatReady && root.themesReady)
+            loadProc.running = true;
+    }
     onPreviewIndexChanged: {
         if (previewIndex >= 0 && previewIndex < themes.length) {
             applyKittyTheme(themes[previewIndex]);
@@ -86,10 +93,13 @@ Singleton {
         var writeCmd = root.configFormat === "lua"
             ? "printf 'hl.config({\\n    general = {\\n        [\"col.active_border\"] = { colors = { \"" + activeColor1 + "\", \"" + activeColor2 + "\" }, angle = " + angle + " },\\n        [\"col.inactive_border\"] = \"" + inactive + "\",\\n    },\\n})\\n' > \"$HOME/.config/hypr/theme-borders.lua\""
             : 'printf "general {\\n    col.active_border = ' + active + '\\n    col.inactive_border = ' + inactive + '\\n}\\n" > "$HOME/.config/hypr/theme-borders.conf"';
+        var applyCmd = root.configFormat === "lua"
+            ? "hyprctl -r eval \"$(/bin/cat $HOME/.config/hypr/theme-borders.lua)\""
+            : 'hyprctl keyword general:col.active_border "' + active + '" && hyprctl keyword general:col.inactive_border "' + inactive + '"';
+
         hyprlandProc.command = ["sh", "-c",
             writeCmd + ' && ' +
-            'hyprctl keyword general:col.active_border "' + active + '" && ' +
-            'hyprctl keyword general:col.inactive_border "' + inactive + '"'
+            applyCmd
         ];
         hyprlandProc.running = true;
     }
@@ -215,6 +225,8 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 root.configFormat = text.trim() === "lua" ? "lua" : "conf";
+                root.configFormatReady = true;
+                root.tryLoadTheme();
             }
         }
     }
@@ -290,7 +302,8 @@ Singleton {
             if (!raw) return;
             try {
                 root.themes = JSON.parse(raw);
-                loadProc.running = true;
+                root.themesReady = true;
+                root.tryLoadTheme();
             } catch (e) {
                 console.error("Failed to parse themes.json:", e);
             }
