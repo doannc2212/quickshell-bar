@@ -14,6 +14,7 @@ Singleton {
     property var wallpaperTheme: ({})
     property string configFormat: "conf" // "conf" or "lua" — which hyprland.* is active
     property bool configFormatReady: false
+    property bool kdeIntegrationEnabled: Quickshell.env("QUICKSHELL_KDE_INTEGRATION") === "1"
     property bool themesReady: false
 
     function tryLoadTheme() {
@@ -104,10 +105,142 @@ Singleton {
         hyprlandProc.running = true;
     }
 
+    function applyKdeTheme(t) {
+        var scheme = [
+            "[General]",
+            "Name=Quickshell",
+            "shadeSortColumn=true",
+            "",
+            "[Colors:Window]",
+            "BackgroundAlternate=" + t.bgSurface,
+            "BackgroundNormal=" + t.bgBase,
+            "DecorationFocus=" + t.accentPrimary,
+            "DecorationHover=" + t.bgHover,
+            "ForegroundActive=" + t.accentPrimary,
+            "ForegroundInactive=" + t.textMuted,
+            "ForegroundLink=" + t.accentCyan,
+            "ForegroundNegative=" + t.accentRed,
+            "ForegroundNeutral=" + t.accentOrange,
+            "ForegroundNormal=" + t.textPrimary,
+            "ForegroundPositive=" + t.accentGreen,
+            "ForegroundVisited=" + t.accentPrimary,
+            "",
+            "[Colors:View]",
+            "BackgroundAlternate=" + t.bgSurface,
+            "BackgroundNormal=" + t.bgBase,
+            "DecorationFocus=" + t.accentPrimary,
+            "DecorationHover=" + t.bgHover,
+            "ForegroundActive=" + t.accentPrimary,
+            "ForegroundInactive=" + t.textMuted,
+            "ForegroundLink=" + t.accentCyan,
+            "ForegroundNegative=" + t.accentRed,
+            "ForegroundNeutral=" + t.accentOrange,
+            "ForegroundNormal=" + t.textPrimary,
+            "ForegroundPositive=" + t.accentGreen,
+            "ForegroundVisited=" + t.accentPrimary,
+            "",
+            "[Colors:Button]",
+            "BackgroundAlternate=" + t.bgBase,
+            "BackgroundNormal=" + t.bgSurface,
+            "DecorationFocus=" + t.accentPrimary,
+            "DecorationHover=" + t.bgHover,
+            "ForegroundActive=" + t.accentPrimary,
+            "ForegroundInactive=" + t.textMuted,
+            "ForegroundLink=" + t.accentCyan,
+            "ForegroundNegative=" + t.accentRed,
+            "ForegroundNeutral=" + t.accentOrange,
+            "ForegroundNormal=" + t.textPrimary,
+            "ForegroundPositive=" + t.accentGreen,
+            "ForegroundVisited=" + t.accentPrimary,
+            "",
+            "[Colors:Selection]",
+            "BackgroundAlternate=" + t.bgSurface,
+            "BackgroundNormal=" + t.bgSelected,
+            "DecorationFocus=" + t.accentPrimary,
+            "DecorationHover=" + t.accentPrimary,
+            "ForegroundActive=" + t.textPrimary,
+            "ForegroundInactive=" + t.textSecondary,
+            "ForegroundLink=" + t.accentCyan,
+            "ForegroundNegative=" + t.accentRed,
+            "ForegroundNeutral=" + t.accentOrange,
+            "ForegroundNormal=" + t.textPrimary,
+            "ForegroundPositive=" + t.accentGreen,
+            "ForegroundVisited=" + t.textPrimary,
+            "",
+            "[Colors:Tooltip]",
+            "BackgroundAlternate=" + t.bgSurface,
+            "BackgroundNormal=" + t.bgSurface,
+            "DecorationFocus=" + t.accentPrimary,
+            "DecorationHover=" + t.bgHover,
+            "ForegroundActive=" + t.accentPrimary,
+            "ForegroundInactive=" + t.textMuted,
+            "ForegroundLink=" + t.accentCyan,
+            "ForegroundNegative=" + t.accentRed,
+            "ForegroundNeutral=" + t.accentOrange,
+            "ForegroundNormal=" + t.textPrimary,
+            "ForegroundPositive=" + t.accentGreen,
+            "ForegroundVisited=" + t.accentPrimary,
+            "",
+            "[Colors:Complementary]",
+            "BackgroundAlternate=" + t.bgSurface,
+            "BackgroundNormal=" + t.bgSurface,
+            "DecorationFocus=" + t.accentPrimary,
+            "DecorationHover=" + t.bgHover,
+            "ForegroundActive=" + t.accentPrimary,
+            "ForegroundInactive=" + t.textMuted,
+            "ForegroundLink=" + t.accentCyan,
+            "ForegroundNegative=" + t.accentRed,
+            "ForegroundNeutral=" + t.accentOrange,
+            "ForegroundNormal=" + t.textPrimary,
+            "ForegroundPositive=" + t.accentGreen,
+            "ForegroundVisited=" + t.accentPrimary
+        ].join("\n");
+
+       kdeThemeProc.command = [
+            "sh", "-c",
+            "mkdir -p \"$HOME/.local/share/color-schemes\" && " +
+            "printf '%s\\n' \"$1\" > \"$HOME/.local/share/color-schemes/Quickshell.colors\" && " +
+
+            "kwriteconfig6 --file kdeglobals --group UiSettings --key ColorScheme Quickshell && " +
+
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key BackgroundAlternate '" + t.bgSurface + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key BackgroundNormal '" + t.bgBase + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key DecorationFocus '" + t.accentPrimary + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key DecorationHover '" + t.bgHover + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundActive '" + t.accentPrimary + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundInactive '" + t.textMuted + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundLink '" + t.accentCyan + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundNegative '" + t.accentRed + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundNeutral '" + t.accentOrange + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundNormal '" + t.textPrimary + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundPositive '" + t.accentGreen + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:Window' --key ForegroundVisited '" + t.accentPrimary + "' && " +
+
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key BackgroundAlternate '" + t.bgSurface + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key BackgroundNormal '" + t.bgBase + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key DecorationFocus '" + t.accentPrimary + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key DecorationHover '" + t.bgHover + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundActive '" + t.accentPrimary + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundInactive '" + t.textMuted + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundLink '" + t.accentCyan + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundNegative '" + t.accentRed + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundNeutral '" + t.accentOrange + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundNormal '" + t.textPrimary + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundPositive '" + t.accentGreen + "' && " +
+            "kwriteconfig6 --file kdeglobals --group 'Colors:View' --key ForegroundVisited '" + t.accentPrimary + "'",
+
+            "sh",
+            scheme
+        ];
+
+        kdeThemeProc.running = true;
+    }
+
     function applyTheme(t) {
         applyKittyTheme(t);
         applySystemColorScheme(!isLightColor(t.bgBase));
         applyHyprlandBorders(t);
+        if (kdeIntegrationEnabled) applyKdeTheme(t);
     }
 
     function setTheme(index) {
@@ -214,7 +347,12 @@ Singleton {
     Process { id: kittyProc; running: false }
     Process { id: colorSchemeProc; running: false }
     Process { id: hyprlandProc; running: false }
-
+    // KDE addition start
+    Process {
+        id: kdeThemeProc
+        running: false
+    }
+    // KDE addition end
     // Which hyprland.* is active — hyprland.lua wins exclusively if present, per
     // Hyprland's own startup precedence (see monitor-manager/MonitorService.qml for the twin check).
     Process {
