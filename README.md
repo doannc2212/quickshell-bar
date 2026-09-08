@@ -184,6 +184,22 @@ listen_on unix:/tmp/kitty-{kitty_pid}
 include theme-colors.conf
 ```
 
+#### KDE integration
+
+the theme switcher can optionally sync the selected theme with KDE's color scheme and use `qt6ct` for Qt theming. this is disabled by default, so the normal GTK setup is unchanged.
+
+**extra dependencies:** `qt6ct`, `kconfig`
+
+to enable it, launch quickshell with these environment variables:
+
+```bash
+QUICKSHELL_KDE_INTEGRATION=1 QT_QPA_PLATFORMTHEME=qt6ct quickshell
+```
+
+`QUICKSHELL_KDE_INTEGRATION=1` enables KDE color-scheme synchronization, while `QT_QPA_PLATFORMTHEME=qt6ct` makes quickshell use qt6ct for its Qt platform theme.
+if you start quickshell through another launcher, autostart mechanism, or compositor configuration, set the same environment variables there instead. no Hyprland-specific configuration is required.
+without these variables, the theme switcher continues to use the default GTK setup.
+
 available theme families:
 - **Tokyo Night** - Night, Storm, Moon, Light
 - **Catppuccin** - Mocha, Macchiato, Frappe, Latte
